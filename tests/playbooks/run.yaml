@@ -1,0 +1,56 @@
+- hosts: all
+  tasks:
+    - name: Setup collection repo name
+      set_fact:
+        _collection_repo: "github.com/ansible-network/ansible_collections.{{ ansible_collection_namespace }}.{{ ansible_collection_name }}"
+
+    - name: Delete all (non hidden) directory in our collection
+      args:
+        chdir: "{{ ansible_user_dir }}/{{ zuul.projects[_collection_repo].src_dir }}"
+      shell: 'find . -maxdepth 1 -mindepth 1 -type d -not -path "*/\.*" -exec rm -rf "{}" \;'
+
+    - name: Bootstrap tox environment
+      include_role:
+        name: tox
+      vars:
+        tox_extra_args: "-vv --notest"
+        tox_install_siblings: false
+        zuul_work_dir: "{{ zuul.projects['github.com/ansible-network/network_collections_migration'].src_dir }}"
+
+    - name: Install python dependencies
+      args:
+        chdir: "{{ ansible_user_dir }}/{{ zuul.projects['github.com/ansible-community/collection_migration'].src_dir }}"
+      shell: "{{ ansible_user_dir }}/{{ zuul.projects['github.com/ansible-network/network_collections_migration'].src_dir }}/.tox/venv/bin/pip install -r requirements.txt"
+
+    - name: Run migration
+      args:
+        chdir: "{{ ansible_user_dir }}/{{ zuul.projects['github.com/ansible-community/collection_migration'].src_dir }}"
+      shell: "{{ ansible_user_dir }}/{{ zuul.projects['github.com/ansible-network/network_collections_migration'].src_dir }}/.tox/venv/bin/python migrate.py -s {{ ansible_user_dir }}/{{ zuul.projects['github.com/ansible-network/network_collections_migration'].src_dir }}/scenarios/{{ ansible_collection_namespace }} --clone-directory {{ ansible_user_dir}}/{{ zuul.projects['github.com/ansible/ansible'].src_dir }}"
+
+    - name: Delete unused content
+      args:
+        chdir: "{{ ansible_user_dir }}/{{ zuul.projects['github.com/ansible-community/collection_migration'].src_dir }}/.cache/collections/ansible_collections/{{ ansible_collection_namespace }}/{{ ansible_collection_name }}"
+      shell: rm -rf galaxy.yml .git .github .gitignore README.md
+
+    - name: Move content into collection git repo
+      args:
+        chdir: "{{ ansible_user_dir }}/{{ zuul.projects['github.com/ansible-community/collection_migration'].src_dir }}/.cache/collections/ansible_collections/{{ ansible_collection_namespace }}/{{ ansible_collection_name }}"
+      shell: "mv * {{ ansible_user_dir }}/{{ zuul.projects[_collection_repo].src_dir }}"
+
+    - name: Run black to format collection
+      include_role:
+        name: tox
+      vars:
+        tox_envlist: black
+        tox_install_siblings: false
+        zuul_work_dir: "{{ zuul.projects[_collection_repo].src_dir }}"
+
+    - name: Prepare to commit files
+      args:
+        chdir: "{{ zuul.projects[_collection_repo].src_dir }}"
+      shell: git add --all
+
+    - name: Create git commit
+      args:
+        chdir: "{{ zuul.projects[_collection_repo].src_dir }}"
+      shell: "git commit -s -m 'Updated from network content collector'"
