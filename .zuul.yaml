@@ -1,0 +1,24 @@
+- job:
+    name: network-collections-migration-base
+    parent: unittests
+    pre-run: tests/playbooks/pre.yaml
+    run: tests/playbooks/run.yaml
+    required-projects:
+      - name: github.com/ansible/ansible
+      - name: github.com/ansible-community/collection_migration
+    vars:
+    timeout: 3600
+    nodeset: centos-8-1vcpu
+
+- job:
+    name: network-collection-migrate-arista-eos
+    parent: network-collection-migrate-base
+    required-projects:
+      - name: github.com/ansible-network/ansible_collections.arista.eos
+    vars:
+      migration_scenarios: arista
+
+- project:
+    check:
+      jobs:
+        - network-collections-migrate-arista-eos
