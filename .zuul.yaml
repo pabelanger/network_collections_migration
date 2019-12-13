@@ -6,7 +6,8 @@
     post-run: tests/playbooks/post.yaml
     required-projects:
       - name: github.com/ansible/ansible
-      - name: github.com/ansible-community/collection_migration
+      - name: github.com/ansible-network/collection_migration
+        override-checkout: feature/network-collections
     timeout: 3600
     nodeset: fedora-latest-1vcpu
 
@@ -61,7 +62,8 @@
     run: tests/playbooks/run.yaml
     required-projects:
       - name: github.com/ansible/ansible
-      - name: github.com/ansible-community/collection_migration
+      - name: github.com/ansible-network/collection_migration
+        override-checkout: feature/network-collections
     timeout: 3600
     nodeset: fedora-latest-1vcpu
 
