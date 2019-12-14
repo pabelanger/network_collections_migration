@@ -79,6 +79,12 @@
         remote_src: true
         src: "{{ ansible_user_dir }}/{{ zuul.projects['github.com/ansible/ansible'].src_dir }}/test/integration/network-integration.requirements.txt"
 
+    - name: Replace network_cli with ansible.netcommon.network_cli
+      args:
+        chdir: "{{ zuul.projects[_collection_repo].src_dir }}/tests"
+        executable: /bin/bash
+      shell: "grep -RiIl 'network_cli' | xargs sed -i 's/\(connection\)\(.*\)\(network_cli\)/\1\2ansible.netcommon.\3/g'"
+
     - name: Run yamlf to format collection
       args:
         chdir: "{{ zuul.projects[_collection_repo].src_dir }}/tests"
