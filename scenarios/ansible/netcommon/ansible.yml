@@ -8,11 +8,11 @@ netcommon:
   - network/cli/*
   - network/netconf/*
   - network/restconf/*
+  - network/system/_net_*
   action:
   - cli_command.py
   - cli_config.py
-  - net_get.py
-  - net_put.py
+  - net_*
   - netconf.py
   - network.py
   become:
