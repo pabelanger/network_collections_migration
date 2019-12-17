@@ -11,8 +11,7 @@ netcommon:
   action:
   - cli_command.py
   - cli_config.py
-  - net_get.py
-  - net_put.py
+  - net_*
   - netconf.py
   - network.py
   become:
