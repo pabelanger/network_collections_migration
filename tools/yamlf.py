@@ -43,6 +43,10 @@ def read_yaml_file(filename):
     with open(filename, 'r') as stream:
         data = yaml.load(stream)
 
+    if filename.endswith('yml'):
+        os.remove(filename)
+        filename = filename.replace('.yml', '.yaml')
+
     with open(filename, 'w') as f:
         yaml.dump(data, f, transform=sequence_indent_four)
 
