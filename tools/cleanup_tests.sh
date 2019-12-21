@@ -8,3 +8,5 @@ grep -RiIl 'network_cli' | xargs perl -i -pe 's/((ansible_)?connection)(.*)((?<!
 # cisco.netcommon.network_cli -> ansible.netcommon.network_cli
 # TODO(pabelager): This is a bug in migrate.py, we should fix it
 grep -RiIl 'cisco.netcommon.network_cli' | xargs perl -i -pe 's/cisco.netcommon.network_cli/ansible.netcommon.network_cli/g' | true
+# mode: on -> mode: 'on'
+grep -RiIl 'mode: on' | xargs perl -i -pe "s/(mode: )(on)/\1'\2'/"
