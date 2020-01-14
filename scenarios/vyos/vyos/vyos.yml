@@ -3,6 +3,8 @@ vyos:
   - network/vyos/*
   - network/vyos/*/*
   - network/vyos/*/*/*
+  - network/vyos/*/*/*/*
+  - network/vyos/*/*/*/*/*
   modules:
   - network/vyos/*
   action:
