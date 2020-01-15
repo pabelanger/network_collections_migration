@@ -88,10 +88,16 @@
     nodeset: fedora-latest-1vcpu
     vars:
       ansible_collection_repo: "github.com/ansible-network/ansible_collections.{{ ansible_collection_namespace }}.{{ ansible_collection_name }}"
+    files:
+      - tests/playbooks/.*
+      - tools/.*
 
 - job:
     name: network-collections-migration-ansible-netcommon
     parent: network-collections-migration-base
+    files:
+      - scenarios/ansible/netcommon/.*
+      - scenarios/arista/eos/.*
     required-projects:
       - name: github.com/ansible-network/ansible_collections.ansible.netcommon
     vars:
