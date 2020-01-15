@@ -9,7 +9,7 @@ collections.
 Adding a new job
 ----------------
 
-We'll be adding a zuul job to migrate content to the following fake
+We'll be adding a Zuul job to migrate content to the following fake
 collection:
 
   https://github.com/ansible-network/ansible_collection.example.fake
