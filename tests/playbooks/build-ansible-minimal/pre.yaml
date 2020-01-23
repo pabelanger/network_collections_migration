@@ -1,0 +1,37 @@
+- hosts: all
+  tasks:
+    - name: Create virtualenv for migration.py
+      shell: virtualenv ~/venv
+
+    - name: Install selinux into virtualenv
+      shell: ~/venv/bin/pip install selinux
+      when: ansible_os_family == "RedHat"
+
+    - name: Install ansible into virtualenv
+      shell: "~/venv/bin/pip install {{ ansible_user_dir }}/{{ zuul.projects['github.com/ansible/ansible'].src_dir }}"
+      when: ansible_test_collections is not defined
+
+    - name: Install python dependencies
+      args:
+        chdir: "{{ ansible_user_dir }}/{{ zuul.projects['github.com/ansible-community/collection_migration'].src_dir }}"
+      shell: ~/venv/bin/pip install -r requirements.txt
+
+    - name: Create .cache/releases directory
+      args:
+        chdir: "{{ ansible_user_dir }}/{{ zuul.projects['github.com/ansible-community/collection_migration'].src_dir }}"
+      shell: mkdir -p .cache/releases
+
+    - name: Symlink ansible/ansible to keep migrate.py happy
+      args:
+        chdir: "{{ ansible_user_dir }}/{{ zuul.projects['github.com/ansible-community/collection_migration'].src_dir }}"
+      shell: "ln -s {{ ansible_user_dir }}/{{ zuul.projects['github.com/ansible/ansible'].src_dir }} .cache/releases/devel.git"
+
+    - name: Rename deprecated modules (network)
+      args:
+        chdir: "{{ ansible_user_dir }}/{{ zuul.projects['github.com/ansible/ansible'].src_dir }}/lib/ansible/modules/network"
+      shell: "python {{ ansible_user_dir }}/{{ zuul.projects['github.com/ansible-community/collection_migration'].src_dir }}/tools/rename_deprecated.py"
+
+    - name: git commit to keep migrate.py happy
+      args:
+        chdir: "{{ ansible_user_dir }}/{{ zuul.projects['github.com/ansible/ansible'].src_dir }}"
+      shell: "git add --all && git commit -a -m 'rename deprecated'"
