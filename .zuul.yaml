@@ -193,6 +193,7 @@
     post-run: tests/playbooks/build-ansible-minimal/post.yaml
     required-projects:
       - name: github.com/ansible/ansible
+      - name: github.com/ansible-community/collection_migration
       - name: github.com/ansible-network/collection_migration
         override-checkout: feature/network-collections
       - name: github.com/ansible-network/network_collections_migration
