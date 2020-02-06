@@ -1,5 +1,6 @@
 netcommon:
   modules:
+  - compat/ipaddress.py
   - network/cli/*
   - network/files/*
   - network/interface/*
