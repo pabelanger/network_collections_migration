@@ -1,3 +1,5 @@
 openvswitch:
+  integration:
+  - prepare_ovs_tests/*
   modules:
   - network/ovs/*
